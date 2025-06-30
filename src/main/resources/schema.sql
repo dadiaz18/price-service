@@ -1,4 +1,4 @@
-CREATE TABLE prices (
+CREATE TABLE IF NOT EXISTS prices (
                         id BIGINT AUTO_INCREMENT PRIMARY KEY,
                         brand_id INT NOT NULL,
                         start_date TIMESTAMP NOT NULL,

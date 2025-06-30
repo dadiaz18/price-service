@@ -77,4 +77,36 @@ public class PriceControllerTest {
                 .andExpect(jsonPath("$.priceList").value(4))
                 .andExpect(jsonPath("$.price").value(38.95));
     }
+
+    @Test
+    @DisplayName("Should return 404 when no price is found")
+    public void testPriceNotFound() throws Exception {
+        mockMvc.perform(get("/prices")
+                        .param("applicationDate", "2023-01-01T10:00:00")
+                        .param("productId", "99999")
+                        .param("brandId", "1"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.code").value("PRICE_NOT_FOUND"));
+    }
+
+    @Test
+    @DisplayName("Should return 400 when parameter is missing")
+    public void testMissingParameter() throws Exception {
+        mockMvc.perform(get("/prices")
+                        .param("applicationDate", "2020-06-14T10:00:00")
+                        .param("productId", "35455"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("MISSING_PARAMETER"));
+    }
+
+    @Test
+    @DisplayName("Should return 400 when parameter has invalid format")
+    public void testInvalidDateFormat() throws Exception {
+        mockMvc.perform(get("/prices")
+                        .param("applicationDate", "14-06-2020 10:00")
+                        .param("productId", "35455")
+                        .param("brandId", "1"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("INVALID_PARAMETER"));
+    }
 }

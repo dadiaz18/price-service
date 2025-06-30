@@ -1,6 +1,7 @@
 package com.diego.priceservice.infrastructure.controller;
 
 import com.diego.priceservice.application.usecase.GetApplicablePriceUseCaseImpl;
+import com.diego.priceservice.domain.exception.PriceNotFoundException;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,14 +24,9 @@ public class PriceController {
             @RequestParam Long productId,
             @RequestParam Long brandId) {
 
-        var optionalPrice = priceService.getApplicablePrice(productId, brandId, date);
+        var price = priceService.getApplicablePrice(productId, brandId, date)
+                .orElseThrow(() -> new PriceNotFoundException(productId, brandId, date));
 
-        if (optionalPrice.isPresent()) {
-            return ResponseEntity.ok(optionalPrice.get());
-        } else {
-            String message = String.format("No price found for productId=%d, brandId=%d at %s",
-                    productId, brandId, date);
-            return ResponseEntity.status(404).body(message);
-        }
+        return ResponseEntity.ok(price);
     }
 }
